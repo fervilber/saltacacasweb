@@ -70,9 +70,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     update(cursors) {
-        // Run animation always ('right' usually for runner)
-        this.anims.play('right', true);
-
         // Reset jump count when on ground
         if (this.body.blocked.down) {
             this.jumpCount = 0;
@@ -95,13 +92,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             // this.scene.sound.play('jump'); // Audio disabled for now
         }
 
-        // Horizontal movement for accel/decel visual
-        if (cursors.right.isDown) {
-            this.setVelocityX(160);
-        } else if (cursors.left.isDown) {
+        // Horizontal movement and animations
+        if (cursors.left.isDown) {
             this.setVelocityX(-160);
+            this.anims.play('right', true); // Use right animation but flipped
+            this.setFlipX(true);
+        } else if (cursors.right.isDown) {
+            this.setVelocityX(160);
+            this.anims.play('right', true);
+            this.setFlipX(false);
         } else {
             this.setVelocityX(0);
+            this.anims.play('right', true); // Keep running by default
+            // If we want to keep the last direction 	when stopped, we could remove setFlipX(false) here.
+            // But usually runner looks forward. Let's keep the last flip state if stopped?
+            // Actually, for a runner, looking right is standard.
+            this.setFlipX(this.flipX); // Keep current flip state
         }
     }
 }

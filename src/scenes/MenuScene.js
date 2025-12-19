@@ -6,7 +6,7 @@ export default class MenuScene extends Phaser.Scene {
     create() {
         // Add Title
         this.add.text(400, 200, 'SALTACACAS', { fontSize: '64px', fill: '#fff' }).setOrigin(0.5);
-
+        this.add.text(400, 280, 'Un juego como la vida misma', { fontSize: '14px', fill: '#0cadedff' }).setOrigin(0.5);
         // Add Play Button
         const playButton = this.add.text(400, 400, 'JUGAR', { fontSize: '32px', fill: '#0f0' })
             .setOrigin(0.5)

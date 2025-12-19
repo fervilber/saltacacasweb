@@ -9,7 +9,7 @@ export default class BootScene extends Phaser.Scene {
 
         // Load local custom assets
         const v = Date.now(); // Cache buster
-        this.load.image('background', 'assets/sprites/background.png?v=' + v);
+        // this.load.image('background', 'assets/sprites/background.png?v=' + v);
         this.load.image('background2', 'assets/sprites/fondo2.png?v=' + v);
         this.load.image('fruit', 'assets/sprites/fruit.png?v=' + v);
         this.load.image('poop', 'assets/sprites/poop.png?v=' + v);

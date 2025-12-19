@@ -9,7 +9,7 @@ export default class Collectible extends Phaser.Physics.Arcade.Sprite {
         this.body.allowGravity = false;
 
         // Reasonable scale for generated image
-        this.setScale(0.03); // Half of 0.06
+        this.setScale(0.12); // Half of 0.06
     }
 
 }

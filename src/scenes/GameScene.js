@@ -37,8 +37,8 @@ export default class GameScene extends Phaser.Scene {
         this.gameSpeed = 2; // Was 5, now 2 (slower)
         this.score = 0;
 
-        // Player - position on the ground (Y=536 so feet touch ground at Y=584)
-        this.player = new Player(this, 100, 536);
+        // Player - position adjusted for Sofia (Visual height ~80px, feet at Y=584)
+        this.player = new Player(this, 100, 544);
         this.player.setDepth(2);
 
         // Groups
@@ -55,6 +55,11 @@ export default class GameScene extends Phaser.Scene {
         // Input
         this.cursors = this.input.keyboard.createCursorKeys();
         this.cursors.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        // Touch Jump
+        this.input.on('pointerdown', (pointer) => {
+            this.player.jump();
+        });
 
         // Spawn Loop for Obstacles
         this.time.addEvent({
@@ -82,7 +87,7 @@ export default class GameScene extends Phaser.Scene {
 
         // UI
         this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
-        this.add.text(16, 50, 'Controls: Space/Up to Jump, Right: Fwd, Left: Slow', { fontSize: '14px', fill: '#000' });
+        this.add.text(16, 50, 'Controls: Tap/Space to Jump | Left side: Slow | Right side: Fast', { fontSize: '14px', fill: '#000' });
 
         // Lives System (Stars)
         this.lives = 3;
@@ -93,6 +98,14 @@ export default class GameScene extends Phaser.Scene {
             star.setDepth(3);
             star.setStrokeStyle(2, 0x000000);
             this.stars.push(star);
+        }
+
+        // Background Music
+        if (!this.sound.get('music')) {
+            this.bgMusic = this.sound.add('music', { volume: 0.5, loop: true });
+            this.bgMusic.play();
+        } else if (!this.sound.get('music').isPlaying) {
+            this.sound.get('music').play();
         }
     }
 
@@ -138,6 +151,7 @@ export default class GameScene extends Phaser.Scene {
     hitObstacle(player, obstacle) {
         if (this.isInvincible) return;
 
+        this.sound.play('hit');
         this.lives--;
 
         // Remove a star
@@ -228,13 +242,14 @@ export default class GameScene extends Phaser.Scene {
             }
         });
 
-        // Speed Control (reduced values)
-        if (this.cursors.right.isDown) {
-            this.gameSpeed = 5; // Was 10
-        } else if (this.cursors.left.isDown) {
-            this.gameSpeed = 1; // Was 2
+        // Speed Control (Improved for Mobile + PC)
+        const pointer = this.input.activePointer;
+        if (this.cursors.right.isDown || (pointer.isDown && pointer.x > 400)) {
+            this.gameSpeed = 5;
+        } else if (this.cursors.left.isDown || (pointer.isDown && pointer.x <= 400)) {
+            this.gameSpeed = 1;
         } else {
-            this.gameSpeed = 2; // Was 5
+            this.gameSpeed = 2;
         }
 
         // Fall Check (Immediate Game Over for falling into the abyss)

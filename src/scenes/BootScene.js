@@ -16,11 +16,13 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('car', 'assets/sprites/car.png?v=' + v);
         this.load.image('platform', 'assets/sprites/platform.png?v=' + v);
 
-        // Player needs to be a spritesheet for animations, using Phaser Labs version
-        this.load.spritesheet('player', 'https://labs.phaser.io/assets/sprites/dude.png', { frameWidth: 32, frameHeight: 48 });
+        // Player Sofia spritesheet (4 frames: 2 left, 2 right)
+        this.load.spritesheet('player', 'assets/sprites/sofia.png?v=' + v, { frameWidth: 50, frameHeight: 88 });
 
-        // Audio removed - causing CORS errors
-        // TODO: Add local audio files later
+        // Audio
+        this.load.audio('jump', 'assets/audio/cartoon-jump-6462.mp3');
+        this.load.audio('hit', 'assets/audio/uh-ohh-38886.mp3');
+        this.load.audio('music', 'assets/audio/hip-hop-rock-beats-118000.mp3');
 
         // Error handling
         this.load.on('loaderror', (file) => {

@@ -10,9 +10,9 @@ export default class Obstacle extends Phaser.Physics.Arcade.Sprite {
 
         // Reasonable scale for generated images
         if (type === 'car') {
-            this.setScale(0.09); // Half of 0.1
+            this.setScale(0.18); // Half of 0.1
         } else if (type === 'poop') {
-            this.setScale(0.05); // Half of 0.08
+            this.setScale(0.07); // Half of 0.08
         }
 
         // Refresh body after scaling

@@ -28,6 +28,7 @@ export default class GameOverScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                this.sound.stopAll(); // Stop music when returning to menu
                 this.scene.stop('GameOverScene');
                 this.scene.stop('GameScene');
                 this.scene.start('MenuScene');

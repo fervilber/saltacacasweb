@@ -36,6 +36,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.initAnimations();
 
+        // Visual Scale for Sofia (Original 88px height -> 0.9 scale = ~79px)
+        this.setScale(0.9);
+        this.refreshBody();
+
         // Jump state
         this.jumpCount = 0;
         this.canJumpAgain = true;
@@ -45,8 +49,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (!this.scene.anims.exists('left')) {
             this.scene.anims.create({
                 key: 'left',
-                frames: this.scene.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
-                frameRate: 10,
+                frames: this.scene.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
+                frameRate: 6,
                 repeat: -1
             });
         }
@@ -54,7 +58,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (!this.scene.anims.exists('turn')) {
             this.scene.anims.create({
                 key: 'turn',
-                frames: [{ key: 'player', frame: 4 }],
+                frames: [{ key: 'player', frame: 2 }],
                 frameRate: 20
             });
         }
@@ -62,8 +66,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (!this.scene.anims.exists('right')) {
             this.scene.anims.create({
                 key: 'right',
-                frames: this.scene.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
-                frameRate: 10,
+                frames: this.scene.anims.generateFrameNumbers('player', { start: 2, end: 3 }),
+                frameRate: 6,
                 repeat: -1
             });
         }
@@ -76,26 +80,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.canJumpAgain = true;
         }
 
-        // Jump logic
+        // Keyboard Jump
         const jumpJustPressed = Phaser.Input.Keyboard.JustDown(cursors.up) || Phaser.Input.Keyboard.JustDown(cursors.space);
-
-        if (jumpJustPressed && this.jumpCount < 2) {
-            this.setVelocityY(-500); // Jump force
-            this.jumpCount++;
-
-            // Optional: feedback visual when jumping in air
-            if (this.jumpCount > 1) {
-                this.setTint(0x00ff00); // Tint green for a moment?
-                this.scene.time.delayedCall(200, () => this.clearTint());
-            }
-
-            // this.scene.sound.play('jump'); // Audio disabled for now
+        if (jumpJustPressed) {
+            this.jump();
         }
 
         // Horizontal movement and animations
         if (cursors.left.isDown) {
             this.setVelocityX(-160);
-            this.anims.play('right', true); // Use right animation but flipped
+            this.anims.play('right', true);
             this.setFlipX(true);
         } else if (cursors.right.isDown) {
             this.setVelocityX(160);
@@ -103,11 +97,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setFlipX(false);
         } else {
             this.setVelocityX(0);
-            this.anims.play('right', true); // Keep running by default
-            // If we want to keep the last direction 	when stopped, we could remove setFlipX(false) here.
-            // But usually runner looks forward. Let's keep the last flip state if stopped?
-            // Actually, for a runner, looking right is standard.
-            this.setFlipX(this.flipX); // Keep current flip state
+            this.anims.play('right', true);
+            this.setFlipX(this.flipX);
+        }
+    }
+
+    jump() {
+        if (this.jumpCount < 2) {
+            this.setVelocityY(-500);
+            this.jumpCount++;
+
+            if (this.jumpCount > 1) {
+                this.setTint(0x00ff00);
+                this.scene.time.delayedCall(200, () => this.clearTint());
+            }
+
+            this.scene.sound.play('jump');
         }
     }
 }

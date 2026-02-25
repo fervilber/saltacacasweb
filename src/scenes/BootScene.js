@@ -16,8 +16,9 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('car', 'assets/sprites/car.png?v=' + v);
         this.load.image('platform', 'assets/sprites/platform.png?v=' + v);
 
-        // Player Sofia spritesheet (4 frames: 2 left, 2 right)
-        this.load.spritesheet('player', 'assets/sprites/sofia.png?v=' + v, { frameWidth: 50, frameHeight: 88 });
+        // Player Spritesheets
+        this.load.spritesheet('sofia', 'assets/sprites/sofia.png?v=' + v, { frameWidth: 50, frameHeight: 88 });
+        this.load.spritesheet('eva', 'assets/sprites/eva.png?v=' + v, { frameWidth: 199, frameHeight: 322 });
 
         // Audio
         this.load.audio('jump', 'assets/audio/cartoon-jump-6462.mp3');

@@ -1,6 +1,17 @@
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y) {
-        super(scene, x, y, 'player');
+    constructor(scene, x, y, textureKey = 'sofia') {
+        super(scene, x, y, textureKey);
+
+        this.textureKey = textureKey;
+        this.scene = scene;
+
+        // Character definitions
+        this.charConfigs = {
+            'sofia': { frameCount: 4, runFrames: [0, 1, 2, 3], idleFrame: 2, height: 88, targetHeight: 80 },
+            'eva': { frameCount: 7, runFrames: [0, 1, 2, 3, 4, 5, 6], idleFrame: 3, height: 322, targetHeight: 80 }
+        };
+
+        const charConfig = this.charConfigs[this.textureKey] || this.charConfigs['sofia'];
 
         // Add to scene and physics
         scene.add.existing(this);
@@ -8,36 +19,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Physics properties
         this.setCollideWorldBounds(true);
-        this.setGravityY(300); // Additional gravity if needed, or rely on world gravity
+        this.setGravityY(300);
 
-        // Stats
-        this.baseVelocity = 200; // The continuous forward speed (if we moved the player, but here we likely move the world)
-        // Note: In endless runners, often the player stays X-static and world moves. 
-        // But the PRD says "Player advances automatically", and "Obstacles move towards player".
-        // Usually visuals: Player X is static (or wobbles), World moves Left.
-        // PRD 5.1: "El personaje avanza automáticamente en el eje X".
-        // PRD 5.2: "El escenario se desplaza en sentido contrario".
-        // This usually means relative motion. 
-        // IF player moves X, camera must follow. IF world moves, Player X stays.
-        // Let's stick to standard Endless Runner: Player X is mostly fixed, world moves left. 
-        // "Acelerar" means world moves faster? Or player moves right on screen?
-        // Let's implement Player moving X for now to match "avanza en el eje X", 
-        // but typically we scroll background. Let's make the player have a running animation 
-        // and handle specific "speed" logic in GameScene or here.
+        this.baseVelocity = 200;
 
-        // Let's implement standard "World Scroll" logic, so Player stays relatively at same X,
-        // but can move slightly forward/back with Accel/Decel keys if authorized, 
-        // OR simply Accel/Decel changes the SCROLL SPEED.
-        // PRD says: "Acelerar: tecla (flecha derecha)".
+        this.initAnimations(charConfig);
 
-        // For this task (Player Movement), I will handle:
-        // 1. Animations
-        // 2. Jump
-
-        this.initAnimations();
-
-        // Visual Scale for Sofia (Original 88px height -> 0.9 scale = ~79px)
-        this.setScale(0.9);
+        // Dynamic Visual Scale to match 80px target height
+        const scaleFactor = charConfig.targetHeight / charConfig.height;
+        this.setScale(scaleFactor);
         this.refreshBody();
 
         // Jump state
@@ -45,30 +35,27 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.canJumpAgain = true;
     }
 
-    initAnimations() {
-        if (!this.scene.anims.exists('left')) {
+    initAnimations(config) {
+        const animLeftKey = `${this.textureKey}_left`;
+        const animRightKey = `${this.textureKey}_right`;
+        const animTurnKey = `${this.textureKey}_turn`;
+
+        if (!this.scene.anims.exists(animRightKey)) {
+            // Simplified: we use all frames (or run set) for running to keep it engaging.
             this.scene.anims.create({
-                key: 'left',
-                frames: this.scene.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
-                frameRate: 6,
+                key: animRightKey,
+                frames: this.scene.anims.generateFrameNumbers(this.textureKey, { frames: config.runFrames }),
+                frameRate: config.frameCount > 4 ? 10 : 6,
                 repeat: -1
             });
         }
+        // Instead of duplicating left rules, we use flipX in update()
 
-        if (!this.scene.anims.exists('turn')) {
+        if (!this.scene.anims.exists(animTurnKey)) {
             this.scene.anims.create({
-                key: 'turn',
-                frames: [{ key: 'player', frame: 2 }],
+                key: animTurnKey,
+                frames: [{ key: this.textureKey, frame: config.idleFrame }],
                 frameRate: 20
-            });
-        }
-
-        if (!this.scene.anims.exists('right')) {
-            this.scene.anims.create({
-                key: 'right',
-                frames: this.scene.anims.generateFrameNumbers('player', { start: 2, end: 3 }),
-                frameRate: 6,
-                repeat: -1
             });
         }
     }
@@ -86,19 +73,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.jump();
         }
 
+        const animRightKey = `${this.textureKey}_right`;
+
         // Horizontal movement and animations
         if (cursors.left.isDown) {
             this.setVelocityX(-160);
-            this.anims.play('right', true);
+            this.anims.play(animRightKey, true);
             this.setFlipX(true);
         } else if (cursors.right.isDown) {
             this.setVelocityX(160);
-            this.anims.play('right', true);
+            this.anims.play(animRightKey, true);
             this.setFlipX(false);
         } else {
             this.setVelocityX(0);
-            this.anims.play('right', true);
-            this.setFlipX(this.flipX);
+            this.anims.play(animRightKey, true);
+            // maintain flip direction
         }
     }
 

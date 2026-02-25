@@ -13,8 +13,25 @@ export default class GameOverScene extends Phaser.Scene {
         bg.fillStyle(0x000000, 0.7); // 70% opacity black
         bg.fillRect(0, 0, 800, 600);
 
-        this.add.text(400, 200, 'GAME OVER', { fontSize: '64px', fill: '#f00', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5);
-        this.add.text(400, 300, 'Score: ' + this.finalScore, { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(400, 180, 'GAME OVER', { fontSize: '64px', fill: '#f00', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5);
+
+        // High Score Logic
+        let highScore = parseInt(localStorage.getItem('saltacacas_highscore')) || 0;
+        let isNewRecord = false;
+
+        if (this.finalScore > highScore) {
+            highScore = this.finalScore;
+            localStorage.setItem('saltacacas_highscore', highScore);
+            isNewRecord = true;
+        }
+
+        this.add.text(400, 260, 'Puntuación: ' + this.finalScore, { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+
+        if (isNewRecord) {
+            this.add.text(400, 320, '¡NUEVO RÉCORD!', { fontSize: '32px', fill: '#ffcc00' }).setOrigin(0.5);
+        } else {
+            this.add.text(400, 320, 'Mejor Puntuación: ' + highScore, { fontSize: '24px', fill: '#aaa' }).setOrigin(0.5);
+        }
 
         const restartButton = this.add.text(400, 450, 'REINTENTAR', { fontSize: '32px', fill: '#fff', backgroundColor: '#333', padding: { x: 10, y: 5 } })
             .setOrigin(0.5)

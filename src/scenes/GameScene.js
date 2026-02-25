@@ -8,6 +8,10 @@ export default class GameScene extends Phaser.Scene {
         super('GameScene');
     }
 
+    init(data) {
+        this.selectedCharacter = data.character || 'sofia'; // Default to sofia if no data provided
+    }
+
     create() {
         // Background
         // Ground - Invisible physics body (Keep this so player doesn't fall)
@@ -38,7 +42,7 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
 
         // Player - position adjusted for Sofia (Visual height ~80px, feet at Y=584)
-        this.player = new Player(this, 100, 544);
+        this.player = new Player(this, 100, 544, this.selectedCharacter);
         this.player.setDepth(2);
 
         // Groups
